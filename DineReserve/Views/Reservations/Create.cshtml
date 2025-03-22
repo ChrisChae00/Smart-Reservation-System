@@ -1,21 +1,119 @@
 ﻿@model DineReserve.Models.Reservation
 
-<h2>Reserve a Table</h2>
+@{
+    ViewData["Title"] = "Make a Reservation";
+}
 
-<form asp-action="Create" method="post">
-    <label asp-for="Name"></label>
-    <input asp-for="Name" /><br />
+<div class="container mt-5">
+    <h2 class="mb-4">Make a Reservation</h2>
+    <div class="row">
+        <!-- Left: Date and Time Selection -->
+        <div class="col-md-6 mb-4">
+            <div class="card p-4">
+                <h5>Select Date</h5>
+                <input type="date" class="form-control mb-3" id="reservation-date" />
 
-    <label asp-for="Email"></label>
-    <input asp-for="Email" /><br />
+                <h5>Select Time</h5>
+                <div class="d-flex flex-wrap gap-2" id="time-buttons">
+                    @foreach (var time in new[] { "17:00", "17:30", "18:00", "18:30", "19:00", "19:30" })
+                    {
+                        <button type="button" class="btn btn-outline-secondary time-btn" data-time="@time">@time</button>
+                    }
+                </div>
+            </div>
+        </div>
 
-    <label asp-for="ReservationTime"></label>
-    <input asp-for="ReservationTime" type="datetime-local" /><br />
+        <!-- Right: Guest Info Form -->
+        <div class="col-md-6">
+            <div class="card p-4">
+                <form asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Full Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter your name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
 
-    <label asp-for="NumberOfGuests"></label>
-    <input asp-for="NumberOfGuests" /><br />
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input name="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                    </div>
 
-    <button type="submit">Reserve</button>
-</form>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
 
-@Html.ValidationSummary()
+                    <div class="mb-3">
+                        <label asp-for="NumberOfGuests" class="form-label">Number of Guests</label>
+                        <select asp-for="NumberOfGuests" class="form-select">
+                            @for (int i = 1; i <= 10; i++)
+                            {
+                                <option value="@i">@i Guest@(i > 1 ? "s" : "")</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Hidden input populated dynamically -->
+                    <input type="hidden" name="ReservationTime" id="reservation-time-hidden" />
+
+                    <button type="submit" class="btn btn-dark w-100">Reserve Table</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation Policies -->
+    <div class="mt-5 p-4 bg-light rounded">
+        <h5>Reservation Policies</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <strong>Cancellation Policy</strong><br />
+                Cancellations must be made at least 24 hours in advance. Late cancellations may incur a fee.
+            </div>
+            <div class="col-md-4">
+                <strong>Special Requests</strong><br />
+                Please note any dietary restrictions or special occasions in the booking notes.
+            </div>
+            <div class="col-md-4">
+                <strong>Large Groups</strong><br />
+                For parties of 6 or more, please contact us directly.<br />
+                <strong>Late Arrival:</strong> Tables will be held for 15 minutes past the reservation time.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const timeButtons = document.querySelectorAll(".time-btn");
+        const dateInput = document.getElementById("reservation-date");
+        const hiddenInput = document.getElementById("reservation-time-hidden");
+
+        timeButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                // Reset active states
+                timeButtons.forEach(btn => {
+                    btn.classList.remove("btn-dark");
+                    btn.classList.add("btn-outline-secondary");
+                });
+
+                // Activate selected
+                button.classList.remove("btn-outline-secondary");
+                button.classList.add("btn-dark");
+
+                // Set hidden input value
+                const selectedDate = dateInput.value;
+                const selectedTime = button.getAttribute("data-time");
+
+                if (selectedDate && selectedTime) {
+                    hiddenInput.value = `${selectedDate}T${selectedTime}`;
+                }
+            });
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
