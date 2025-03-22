@@ -1,0 +1,21 @@
+﻿@model DineReserve.Models.Reservation
+
+<h2>Reserve a Table</h2>
+
+<form asp-action="Create" method="post">
+    <label asp-for="Name"></label>
+    <input asp-for="Name" /><br />
+
+    <label asp-for="Email"></label>
+    <input asp-for="Email" /><br />
+
+    <label asp-for="ReservationTime"></label>
+    <input asp-for="ReservationTime" type="datetime-local" /><br />
+
+    <label asp-for="NumberOfGuests"></label>
+    <input asp-for="NumberOfGuests" /><br />
+
+    <button type="submit">Reserve</button>
+</form>
+
+@Html.ValidationSummary()
