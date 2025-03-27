@@ -1,19 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "Welcome to DineReserve";
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="container text-center mt-5">
-    <h1 class="display-4">Welcome to <strong>DineReserve</strong></h1>
-    <p class="lead">Your smart table reservation assistant for small restaurants.</p>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 
-    <a href="/Reservations/Create" class="btn btn-primary btn-lg mt-4">Reserve a Table</a>
+<div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light">
+    <h1 class="mb-5">Welcome to DineReserve</h1>
 
-    <div class="mt-5">
-        <h5>How it works:</h5>
-        <ol class="text-start d-inline-block">
-            <li>Choose your preferred date and time</li>
-            <li>Fill in your reservation details</li>
-            <li>Receive a confirmation instantly</li>
-        </ol>
+    <div class="d-flex gap-4">
+        <a href="/Reservations/Create" class="btn btn-lg btn-primary px-5 py-3">
+            I'm a Customer
+        </a>
+        <a href="/Admin/Login" class="btn btn-lg btn-secondary px-5 py-3">
+            I'm an Admin
+        </a>
     </div>
 </div>

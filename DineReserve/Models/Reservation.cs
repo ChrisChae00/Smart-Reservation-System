@@ -18,5 +18,8 @@ namespace DineReserve.Models
 
         [Range(1, 20)]
         public int NumberOfGuests { get; set; }
+
+        public string Status { get; set; } = "Confirmed"; 
     }
+
 }
