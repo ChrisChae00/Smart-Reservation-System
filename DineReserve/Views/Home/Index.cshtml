@@ -1,18 +1,28 @@
 ﻿@{
-    ViewData["Title"] = "Welcome";
+	ViewData["Title"] = "Welcome to DineReserve";
 }
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<div class="container mt-5 text-center">
+	<h1 class="display-4 fw-bold">Welcome to DineReserve</h1>
+	<p class="lead">Fine dining made effortless. Reserve your table online with ease.</p>
 
-<div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light">
-    <h1 class="mb-5">Welcome to DineReserve</h1>
-
-    <div class="d-flex gap-4">
-        <a href="/Reservations/Create" class="btn btn-lg btn-primary px-5 py-3">
-            I'm a Customer
-        </a>
-        <a href="/Admin/Login" class="btn btn-lg btn-secondary px-5 py-3">
-            I'm an Admin
-        </a>
-    </div>
+	<img src="https://placehold.co/900x400?text=Restaurant+Image&font=roboto"
+		 class="img-fluid rounded shadow my-4"
+		 alt="Restaurant welcome image placeholder" />
+	<div>
+		<a href="/Reservations/Create" class="btn btn-outline-success">Looking for a table?</a>
+	</div>
+	<div class="mt-5 text-muted">
+		<p><strong>📍 Location:</strong> 123 Main Street, Food City</p>
+		<p><strong>🕒 Hours:</strong> Mon–Sun | 11:00 AM – 10:00 PM</p>
+		<p><strong>📞 Phone:</strong> (555) 123-4567</p>
+		<p>
+			<strong>Follow us:</strong>
+			<a href="#" class="text-muted me-3"><i class="bi bi-facebook fs-4" style="margin-left: 4px"></i></a>
+			<a href="#" class="text-muted me-3"><i class="bi bi-instagram fs-4"></i></a>
+			<a href="#" class="text-muted me-3"><i class="bi bi-twitter fs-4"></i></a>
+		</p>
+	</div>
 </div>

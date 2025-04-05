@@ -2,7 +2,6 @@
 using DineReserve.Data;
 using DineReserve.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace DineReserve.Controllers
 {
@@ -15,43 +14,21 @@ namespace DineReserve.Controllers
             _context = context;
         }
 
-        // GET: /Admin/Login
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        // POST: /Admin/Login
-        [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
-        {
-            var admin = await _context.Admins
-                .FirstOrDefaultAsync(a => a.Username == username && a.Password == password);
-
-            if (admin != null)
-            {
-                HttpContext.Session.SetString("AdminUser", username);
-                return RedirectToAction("Dashboard");
-            }
-
-            ViewBag.Error = "Invalid credentials.";
-            return View();
-        }
-
         // GET: /Admin/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            if (HttpContext.Session.GetString("AdminUser") == null)
-                return RedirectToAction("Login");
+            // Only allow access if logged in as admin
+            if (HttpContext.Session.GetString("Role") != "Admin")
+                return RedirectToAction("Login", "Home");
 
             var reservations = await _context.Reservations
                 .OrderBy(r => r.ReservationTime)
                 .ToListAsync();
 
-
             return View(reservations);
         }
 
+        // POST: /Admin/UpdateStatus
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int id, string status)
         {
@@ -63,12 +40,6 @@ namespace DineReserve.Controllers
             }
 
             return RedirectToAction("Dashboard");
-        }
-
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
         }
     }
 }

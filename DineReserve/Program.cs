@@ -1,47 +1,34 @@
 using DineReserve.Data;
 using Microsoft.EntityFrameworkCore;
+using DineReserve.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register EF Core
+// Register EF Core with SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add session support
+// Enable session support
 builder.Services.AddSession();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Enable session and authorization middleware
 app.UseSession();
 app.UseAuthorization();
 
+// Set default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DineReserve.Data.AppDbContext>();
-
-    context.Database.EnsureCreated(); // creates DB if not exists
-
-    if (!context.Admins.Any())
-    {
-        context.Admins.Add(new DineReserve.Models.Admin
-        {
-            Username = "admin@restaurant.com",
-            Password = "admin123"
-        });
-
-        context.SaveChanges();
-    }
-}

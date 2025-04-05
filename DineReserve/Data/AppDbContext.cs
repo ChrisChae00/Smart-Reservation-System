@@ -11,6 +11,6 @@ namespace DineReserve.Data
         }
 
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<Admin> Admins { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
