@@ -8,7 +8,12 @@ namespace DineReserve.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        [Required]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        public string PhoneNumber { get; set; }
 
         [Required, EmailAddress]
         public string Email { get; set; }
@@ -19,7 +24,7 @@ namespace DineReserve.Models
         [Range(1, 20)]
         public int NumberOfGuests { get; set; }
 
-        public string Status { get; set; } = "Confirmed"; 
+        public string Status { get; set; } = "Pending"; 
     }
 
 }

@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Make a Reservation";
+    var blockedTimes = ViewBag.BlockedTimes as List<string> ?? new List<string>();
+    var availableTimes = new[] { "17:00", "17:30", "18:00", "18:30", "19:00", "19:30" };
 }
 
 <div class="container mt-5">
@@ -11,14 +13,20 @@
         <div class="col-md-6 mb-4">
             <div class="card p-4">
                 <h5>Select Date</h5>
-                <input type="date" class="form-control mb-3" id="reservation-date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-
+                <input type="date" class="form-control mb-3" id="reservation-date"
+                       value="@DateTime.Now.ToString("yyyy-MM-dd")" />
 
                 <h5>Select Time</h5>
                 <div class="d-flex flex-wrap gap-2" id="time-buttons">
-                    @foreach (var time in new[] { "17:00", "17:30", "18:00", "18:30", "19:00", "19:30" })
+                    @foreach (var time in availableTimes)
                     {
-                        <button type="button" class="btn btn-outline-secondary time-btn" data-time="@time">@time</button>
+                        var isBlocked = blockedTimes.Contains(time);
+                        <button type="button"
+                                class="btn @(isBlocked ? "btn-secondary disabled" : "btn-outline-secondary") time-btn"
+                                data-time="@time"
+                        @(isBlocked ? "disabled" : "")>
+                            @time
+                        </button>
                     }
                 </div>
             </div>
@@ -29,14 +37,21 @@
             <div class="card p-4">
                 <form asp-action="Create" method="post">
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Full Name</label>
-                        <input asp-for="Name" class="form-control" placeholder="Enter your name" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <label asp-for="FirstName" class="form-label">First Name</label>
+                        <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input name="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                        <label asp-for="LastName" class="form-label">Last Name</label>
+                        <input asp-for="LastName" class="form-control" placeholder="Enter your last name" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
@@ -55,7 +70,7 @@
                         </select>
                     </div>
 
-                    <!-- Hidden input populated dynamically -->
+                    <!-- Hidden field for selected datetime -->
                     <input type="hidden" name="ReservationTime" id="reservation-time-hidden" />
 
                     <button type="submit" class="btn btn-dark w-100">Reserve Table</button>
@@ -70,16 +85,15 @@
         <div class="row">
             <div class="col-md-4">
                 <strong>Cancellation Policy</strong><br />
-                Cancellations must be made at least 24 hours in advance. Late cancellations may incur a fee.
+                Cancellations must be made at least 24 hours in advance.
             </div>
             <div class="col-md-4">
                 <strong>Special Requests</strong><br />
-                Please note any dietary restrictions or special occasions in the booking notes.
+                Let us know dietary restrictions or special events in the notes.
             </div>
             <div class="col-md-4">
                 <strong>Large Groups</strong><br />
-                For parties of 6 or more, please contact us directly.<br />
-                <strong>Late Arrival:</strong> Tables will be held for 15 minutes past the reservation time.
+                For 6 or more guests, please contact us directly.
             </div>
         </div>
     </div>
@@ -87,34 +101,54 @@
 
 @section Scripts {
     <script>
-        const timeButtons = document.querySelectorAll(".time-btn");
         const dateInput = document.getElementById("reservation-date");
+        const timeButtons = document.querySelectorAll(".time-btn");
         const hiddenInput = document.getElementById("reservation-time-hidden");
 
-        timeButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                // Reset active states
-                timeButtons.forEach(btn => {
-                    btn.classList.remove("btn-dark");
-                    btn.classList.add("btn-outline-secondary");
+        function fetchBlockedTimes(date) {
+            fetch(`/Reservations/GetBlockedTimes?date=${date}`)
+                .then(res => res.json())
+                .then(blockedTimes => {
+                    timeButtons.forEach(btn => {
+                        const time = btn.getAttribute("data-time");
+                        const isBlocked = blockedTimes.includes(time);
+
+                        btn.disabled = isBlocked;
+                        btn.classList.remove("btn-dark", "btn-outline-secondary", "btn-secondary", "disabled");
+
+                        if (isBlocked) {
+                            btn.classList.add("btn-secondary", "disabled");
+                        } else {
+                            btn.classList.add("btn-outline-secondary");
+                        }
+                    });
+                });
+        }
+
+        dateInput.addEventListener("change", () => {
+            fetchBlockedTimes(dateInput.value);
+            hiddenInput.value = ""; // clear previous selection
+        });
+
+        timeButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (btn.disabled) return;
+
+                timeButtons.forEach(b => {
+                    b.classList.remove("btn-dark");
+                    b.classList.add("btn-outline-secondary");
                 });
 
-                // Activate selected
-                button.classList.remove("btn-outline-secondary");
-                button.classList.add("btn-dark");
+                btn.classList.remove("btn-outline-secondary");
+                btn.classList.add("btn-dark");
 
-                // Set hidden input value
-                const selectedDate = dateInput.value;
-                const selectedTime = button.getAttribute("data-time");
-
-                if (selectedDate && selectedTime) {
-                    hiddenInput.value = `${selectedDate}T${selectedTime}`;
-                }
+                hiddenInput.value = `${dateInput.value}T${btn.getAttribute("data-time")}`;
             });
         });
+
+        // Load blocked times initially
+        fetchBlockedTimes(dateInput.value);
     </script>
 
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

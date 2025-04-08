@@ -16,7 +16,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
@@ -26,13 +26,35 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Reservations" asp-action="Create">Reservations</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Login">Log in</a>
-                        </li>
+
+                        @if (Context.Session.GetString("UserName") != null)
+                        {
+                            var userName = Context.Session.GetString("UserName");
+                            var userRole = Context.Session.GetString("Role");
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                                    @userName
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    @if (userRole == "Admin")
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">Dashboard</a></li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                    }
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="Logout">Log out</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Login">Log in</a>
+                            </li>
+                        }
+
                     </ul>
+
                 </div>
             </div>
         </nav>

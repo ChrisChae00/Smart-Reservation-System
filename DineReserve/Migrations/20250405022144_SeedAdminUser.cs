@@ -13,7 +13,7 @@ namespace DineReserve.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "FirstName", "LastName", "Email", "Password", "Role" },
-                values: new object[] { "Admin", "User", "admin@dinereserve.com", "admin123", "Admin" }
+                values: new object[] { "Admin", "User", "admin@dinereserve.com", "admin123!", "Admin" }
 );
         }
 

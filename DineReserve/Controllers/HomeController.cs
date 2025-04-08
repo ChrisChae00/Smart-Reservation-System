@@ -35,7 +35,11 @@ public class HomeController : Controller
         if (user != null)
         {
             HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
+            HttpContext.Session.SetString("FirstName", user.FirstName);
+            HttpContext.Session.SetString("LastName", user.LastName);
+            HttpContext.Session.SetString("Email", user.Email);
             HttpContext.Session.SetString("Role", user.Role);
+
 
             // Redirect based on role
             if (user.Role == "Admin")
@@ -70,7 +74,11 @@ public class HomeController : Controller
         await _context.SaveChangesAsync();
 
         HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
+        HttpContext.Session.SetString("FirstName", user.FirstName);
+        HttpContext.Session.SetString("LastName", user.LastName);
+        HttpContext.Session.SetString("Email", user.Email);
         HttpContext.Session.SetString("Role", user.Role);
+
 
         return RedirectToAction("Index");
     }
@@ -84,6 +92,13 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
+    }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

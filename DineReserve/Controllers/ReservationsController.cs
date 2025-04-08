@@ -17,29 +17,53 @@ namespace DineReserve.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var model = new Reservation();
+
+            // Auto-fill if user is logged in
+            if (HttpContext.Session.GetString("Email") != null)
+            {
+                model.FirstName = HttpContext.Session.GetString("FirstName");
+                model.LastName = HttpContext.Session.GetString("LastName");
+                model.Email = HttpContext.Session.GetString("Email");
+            }
+
+            ViewBag.BlockedTimes = _context.Reservations
+                .Where(r => r.ReservationTime.Date == DateTime.Today &&
+                            (r.Status == "Pending" || r.Status == "Confirmed"))
+                .Select(r => r.ReservationTime.ToString("HH:mm"))
+                .ToList();
+
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Create(Reservation reservation)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Reservation reservation)
         {
             if (ModelState.IsValid)
             {
-                _context.Reservations.Add(reservation);
-                _context.SaveChanges();
-
-                return RedirectToAction("Confirmation", new { id = reservation.Id });
+                _context.Add(reservation);
+                await _context.SaveChangesAsync();
+                return View("Thankyou", reservation);
             }
+
             return View(reservation);
         }
 
-        public IActionResult Confirmation(int id)
+        [HttpGet]
+        public IActionResult GetBlockedTimes(string date)
         {
-            var reservation = _context.Reservations.FirstOrDefault(r => r.Id == id);
-            if (reservation == null)
-                return NotFound();
+            if (!DateTime.TryParse(date, out var selectedDate))
+                return BadRequest("Invalid date format.");
 
-            return View(reservation);
+            var blockedTimes = _context.Reservations
+                .Where(r => r.ReservationTime.Date == selectedDate.Date &&
+                            (r.Status == "Pending" || r.Status == "Confirmed"))
+                .Select(r => r.ReservationTime.ToString("HH:mm"))
+                .ToList();
+
+            return Json(blockedTimes);
         }
+
     }
 }

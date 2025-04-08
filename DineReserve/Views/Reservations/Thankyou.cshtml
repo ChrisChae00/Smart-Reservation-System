@@ -1,0 +1,25 @@
+﻿@model DineReserve.Models.Reservation
+
+@{
+    ViewData["Title"] = "Thank You!";
+}
+
+
+<div class="container mt-5 text-center">
+    <div class="alert alert-success shadow-sm p-4">
+        <h2 class="mb-3">Thank you for your reservation, @Model.FirstName!</h2>
+        <p class="lead">We’ve received your request for:</p>
+        <p>
+            <strong>Date & Time:</strong><br />
+            @Model.ReservationTime.ToString("dddd, MMMM d, yyyy • h:mm tt")
+        </p>
+        <p>
+            <strong>Guests:</strong> @Model.NumberOfGuests<br />
+            <strong>Email:</strong> @Model.Email
+        </p>
+        <p class="mt-4">
+            Your reservation request has been received. Our host will review it and send you a confirmation email once your table is secured. 🍽️
+        </p>
+        <a class="btn btn-outline-dark" asp-controller="Home" asp-action="Index">Back to Home</a>
+    </div>
+</div>
